@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArkVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #D4A017;
+    --gold-bright: #FFD050;
+    --gold-dim: #6B5000;
+    --black: #080808;
+    --panel: #111;
+    --border: #1e1e1e;
+    --text: #F0E8D0;
+    --dim: #555;
+    --green: #2D7A4F;
+    --red: #7A2D2D;
+  }
+
+  body {
+    width: 320px;
+    min-height: 420px;
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: #0A0A0A;
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+
+  .version {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  /* PLATFORM BADGE */
+  .platform-bar {
+    padding: 10px 16px;
+    background: #0D0D0D;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .platform-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s infinite;
+  }
+
+  .platform-dot.inactive { background: var(--dim); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .platform-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  .platform-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  /* MAIN CONTENT */
+  .content {
+    padding: 16px;
+  }
+
+  /* VAULT BUTTON */
+  .vault-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #000;
+    border: none;
+    padding: 14px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
+  .vault-btn:hover { background: var(--gold-bright); }
+  .vault-btn:disabled { background: #2a2a2a; color: var(--dim); cursor: not-allowed; }
+
+  .vault-btn.success { background: var(--green); color: #fff; }
+  .vault-btn.error { background: var(--red); color: #fff; }
+
+  /* NOT ON PLATFORM */
+  .not-supported {
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .not-supported .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .not-supported p {
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .not-supported .supported-list {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 1px;
+    line-height: 2;
+  }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stat-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* RECENT VAULTS */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vault-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .vault-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .vault-item:hover { border-color: var(--gold-dim); }
+
+  .vault-item-left { flex: 1; min-width: 0; }
+
+  .vault-title {
+    font-size: 11px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  .vault-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+
+  .vault-platform-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 7px;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    padding: 2px 5px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .empty-vault {
+    text-align: center;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    border: 1px dashed var(--border);
+  }
+
+  /* ACTIONS */
+  .actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .action-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    padding: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+
+  .action-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* STATUS MESSAGE */
+  .status-msg {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 8px;
+    margin-bottom: 10px;
+    display: none;
+  }
+
+  .status-msg.show { display: block; }
+  .status-msg.ok { color: #4CAF50; border: 1px solid #1a3d1a; background: #0d1f0d; }
+  .status-msg.err { color: #f44; border: 1px solid #3d1a1a; background: #1f0d0d; }
+  .status-msg.info { color: var(--gold); border: 1px solid var(--gold-dim); background: #1a1400; }
+
+  /* SCROLLBAR */
+  .vault-list::-webkit-scrollbar { width: 3px; }
+  .vault-list::-webkit-scrollbar-track { background: var(--black); }
+  .vault-list::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+  /* FOOTER */
+  .footer {
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: var(--dim);
+    letter-spacing: 1px;
+  }
+
+  .footer a { color: var(--gold-dim); text-decoration: none; }
+  .footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">ARKVAULT</div>
+  <div class="version">v1.0.0</div>
+</div>
+
+<div class="platform-bar" id="platformBar">
+  <div class="platform-dot inactive" id="platformDot"></div>
+  <div class="platform-label">Platform:</div>
+  <div class="platform-name" id="platformName">Detecting...</div>
+</div>
+
+<div class="content">
+
+  <!-- STATUS MESSAGE -->
+  <div class="status-msg" id="statusMsg"></div>
+
+  <!-- SUPPORTED PLATFORM VIEW -->
+  <div id="supportedView" style="display:none;">
+    <button class="vault-btn" id="vaultBtn">⬡ Vault This Conversation</button>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-number" id="totalVaults">0</span>
+        <span class="stat-label">Vaulted</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number" id="totalPlatforms">0</span>
+        <span class="stat-label">Platforms</span>
+      </div>
+    </div>
+
+    <div class="section-title">Recent Vaults</div>
+    <div class="vault-list" id="vaultList">
+      <div class="empty-vault">No vaults yet — vault your first conversation above</div>
+    </div>
+
+    <div class="actions-row">
+      <button class="action-btn" id="exportBtn">↓ Export All</button>
+      <button class="action-btn" id="clearBtn">✕ Clear Vault</button>
+    </div>
+  </div>
+
+  <!-- NOT SUPPORTED VIEW -->
+  <div id="notSupportedView" style="display:none;">
+    <div class="not-supported">
+      <div class="icon">⬡</div>
+      <p>Open ArkVault on a supported AI platform to vault conversations.</p>
+      <div class="supported-list">
+        ChatGPT · Claude · Gemini<br>
+        Copilot · More coming soon
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-number" id="totalVaults2">0</span>
+        <span class="stat-label">Vaulted</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-number" id="totalPlatforms2">0</span>
+        <span class="stat-label">Platforms</span>
+      </div>
+    </div>
+
+    <div class="section-title">Recent Vaults</div>
+    <div class="vault-list" id="vaultList2">
+      <div class="empty-vault">No vaults yet</div>
+    </div>
+
+    <div class="actions-row">
+      <button class="action-btn" id="exportBtn2">↓ Export All</button>
+      <button class="action-btn" id="clearBtn2">✕ Clear Vault</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <a href="https://arkvault.ai" target="_blank">arkvault.ai</a> · Local Storage · Private
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
