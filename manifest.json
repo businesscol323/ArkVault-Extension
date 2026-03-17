@@ -33,6 +33,10 @@
         "https://gemini.google.com/*",
         "https://copilot.microsoft.com/*",
         "https://www.bing.com/chat*"
+              "https://grok.com/*",
+      "https://*.grok.com/*",
+      "https://grok.x.ai/*",
+      "https://x.com/i/grok*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
