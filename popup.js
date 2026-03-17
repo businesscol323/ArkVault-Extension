@@ -35,7 +35,7 @@ function formatDate(iso) {
 }
 
 function platformShort(platform) {
-  const map = { ChatGPT: 'GPT', Claude: 'CLDE', Gemini: 'GEM', Copilot: 'CPLT' };
+  const map = { ChatGPT: 'GPT', Claude: 'CLDE', Gemini: 'GEM', Copilot: 'CPLT', Grok: 'GROK' };
   return map[platform] || platform.substring(0, 4).toUpperCase();
 }
 
@@ -261,7 +261,8 @@ async function init() {
     'chat.openai.com', 'chatgpt.com',
     'claude.ai',
     'gemini.google.com',
-    'copilot.microsoft.com', 'bing.com/chat'
+    'copilot.microsoft.com', 'bing.com/chat',
+    'grok.com', 'grok.x.ai', 'x.com/i/grok'
   ];
 
   const isSupported = supportedDomains.some(d => url.includes(d));
@@ -278,6 +279,8 @@ async function init() {
     platformName = 'Gemini'; platformActive = true;
   } else if (url.includes('copilot.microsoft.com') || url.includes('bing.com/chat')) {
     platformName = 'Copilot'; platformActive = true;
+  } else if (url.includes('grok.com') || url.includes('grok.x.ai') || url.includes('x.com/i/grok')) {
+    platformName = 'Grok'; platformActive = true;
   }
 
   // Update platform bar
