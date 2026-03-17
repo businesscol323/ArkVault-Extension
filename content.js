@@ -10,6 +10,7 @@
     if (url.includes('claude.ai')) return 'Claude';
     if (url.includes('gemini.google.com')) return 'Gemini';
     if (url.includes('copilot.microsoft.com') || url.includes('bing.com/chat')) return 'Copilot';
+    if (url.includes('grok.com') || url.includes('grok.x.ai') || url.includes('x.com/i/grok')) return 'Grok';
     return null;
   }
 
@@ -121,6 +122,39 @@
     return messages;
   }
 
+  function extractGrok() {
+    const messages = [];
+
+    // Grok uses message bubbles with specific roles
+    const turns = document.querySelectorAll('[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"]');
+
+    if (turns.length > 0) {
+      turns.forEach(turn => {
+        const text = turn.innerText.trim();
+        if (text.length < 5) return;
+        const isUser = turn.closest('[class*="human"]') ||
+                       turn.closest('[class*="user"]') ||
+                       turn.closest('[class*="Human"]') ||
+                       turn.closest('[class*="User"]') ||
+                       turn.getAttribute('data-author') === 'human';
+        messages.push({ role: isUser ? 'user' : 'assistant', content: text });
+      });
+    }
+
+    // Fallback — grab all visible text blocks
+    if (messages.length === 0) {
+      const blocks = document.querySelectorAll('p, [class*="prose"], [class*="text"]');
+      blocks.forEach(b => {
+        const text = b.innerText.trim();
+        if (text.length > 10) {
+          messages.push({ role: 'unknown', content: text });
+        }
+      });
+    }
+
+    return messages;
+  }
+
   function extractConversation() {
     const platform = detectPlatform();
     if (!platform) return null;
@@ -132,10 +166,11 @@
       case 'Claude': messages = extractClaude(); break;
       case 'Gemini': messages = extractGemini(); break;
       case 'Copilot': messages = extractCopilot(); break;
+      case 'Grok': messages = extractGrok(); break;
     }
 
     // Get page title for conversation name
-    const title = document.title.replace(' - ChatGPT', '').replace(' | Claude', '').replace(' - Gemini', '').trim();
+    const title = document.title.replace(' - ChatGPT', '').replace(' | Claude', '').replace(' - Gemini', '').replace(' - Grok', '').replace(' | Grok', '').trim();
 
     return {
       platform,
